@@ -1,11 +1,12 @@
 #Definimos nuestras variables globales
 MAX_ERROR = 0.001
 
-def sen(x: float):
+def senA(x: float):
     #Declaramos e inicializamos nuestras variables locales
     n = 0
     factorial = 0.0
-    value = 0.0
+    estimatedValue = 0.0
+    currValue = 0.0
     currentError = 1
     endLoop = False
 
@@ -19,21 +20,21 @@ def sen(x: float):
             for i in range(2*n, 2*n+2):
                 factorial = factorial * i
 
-        #Calculamos el error cometido
-        currentError = abs(((x**(2*n+1))/factorial))
+        currValue = (x**(2*n+1))/factorial #Valor actual
+        currentError = abs(currValue) #Calculamos el error cometido
         print(currentError)
 
         if currentError > MAX_ERROR:
-            #Calculamos el valor de nuestra serie
-            value = value + currentError * ((-1)**n)
+            #Calculamos el valor estimado de nuestra serie
+            estimatedValue = estimatedValue + currValue * ((-1)**n)
             #Iteramos
             n += 1
         else:
             endLoop = True
     
-    return value
+    return estimatedValue
 
-def sen2(x: float):
+def senB(x: float):
     n = 0
     factorial = 0.0
     elem = 0.0
@@ -67,11 +68,11 @@ def sen2(x: float):
             endLoop = True
     
     return oldValue
+
 if __name__ == "__main__":
     for i in range(-2, 3):
         x = i*3.14
-        print(x)
-        senX = sen(x)
+        senX = senA(x)
         print(f"El seno es {senX}\n")
-        senX = sen2(x)
+        senX = senB(x)
         print(f"El seno es {senX}\n")

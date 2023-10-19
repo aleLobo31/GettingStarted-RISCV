@@ -28,11 +28,12 @@
         else2: fmv.s fa0, fa1
         endWhile2: jr ra #Devolvemos valor de la potencia en fa0
 		
-    sumarResultado: li t0, 2 #argumentos en fa0 (Estimación), fa1 (ErrorActual) y a0 (n)
+    sumarResultado: #argumentos en fa0 (Estimación), fa1 (ErrorActual) y a0 (n)
+        li t0, 2 
         rem t0, a0, t0 
-        beq t0, zero, else3
+        beq t0, zero, elseSumarResultado
             fneg.s fa1, fa1
-        else3: fadd.s fa0, fa0, fa1 
+        elseSumarResultado: fadd.s fa0, fa0, fa1 
         jr ra #Devuelve el valor de la estimación en fa0
 
     calculoSeno: #No terminal
