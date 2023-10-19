@@ -1,0 +1,1 @@
+#Aquí van las funciones numero e, coseno, seno y tangente
