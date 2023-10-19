@@ -13,7 +13,6 @@ def number_e():
             factorial = 1.0
         else:
             factorial = factorial * n
-        print(factorial)
 
         errorCometido = 1/factorial
 
