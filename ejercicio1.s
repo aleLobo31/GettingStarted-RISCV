@@ -287,7 +287,7 @@
         jr ra
 
     factorial_numE: #argumentos en fa0 y a0
-        beq a0, zero, else_Factorial_numE #En n = 0 devolvemos un 1.
+        beq a0, zero, else_factorial_numE #En n = 0 devolvemos un 1.
             fcvt.s.w ft0, a0 #ft0 (lo utilizamos para convertir a0 a coma flotante)
             fmul.s fa0, fa0, ft0
             j fin_factorial_numE
