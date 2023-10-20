@@ -400,7 +400,7 @@
             #Desapilamos los registros s y ra
             flw fs0, 12(sp)
             flw fs1, 8(sp)
-            flw fs0, 4(sp)
+            flw fs2, 4(sp)
             lw ra, 0(sp)
             addi sp, sp, 16
             jr ra
