@@ -11,28 +11,28 @@
         #t1 --> 2n + 2
         #ft0 --> Valor de t0 en coma flotante para poder multiplicarlo con fa0
 
-        beq a0, zero, else1
+        beq a0, zero, else_factorial_seno
 
         slli t0, a0, 1
         mv t1, t0
         addi t1, t1, 2
         
-        while1: 
-            bge t0, t1, endWhile1
+        while_factorial_seno: 
+            bge t0, t1, endWhile_factorial_seno
             fcvt.s.w ft0, t0
             fmul.s fa0, fa0, ft0
             addi t0, t0, 1
-            j while1
+            j while_factorial_seno
         
-        endWhile1: 
+        endWhile_factorial_seno: 
             jr ra       #Devuelve el nuevo factorial en fa0
         
-        else1: 
+        else_factorial_seno: 
             li t0, 1
             fcvt.s.w fa0, t0
             jr ra       #Devuelve el nuevo factorial en fa0
 
-    potencia_seno: 
+    potencia_seno_coseno: 
         #Esta función toma el valor de la anterior potencia y lo multiplica dos veces por x obteniendo así x^(2n + 1)
 
         #Argumentos:
@@ -45,24 +45,24 @@
         #t1 --> cota (2)
         
         
-        beq a0, zero, else2         #Si n es igual a 0 simplemente devolvemos x
+        beq a0, zero, else_potencia         #Si n es igual a 0 simplemente devolvemos x
 
         li t0, 0
         li t1, 2
         
-        while2: 
-            bge t0, t1, endWhile2
+        while_potencia: 
+            bge t0, t1, endWhile_potencia
             fmul.s fa0, fa0, fa1
             addi t0, t0, 1
-            j while2
+            j endWhile_potencia
         
-        else2: 
+        else_potencia: 
             fmv.s fa0, fa1
         
-        endWhile2: 
+        endWhile_potencia: 
             jr ra       #Devolvemos valor de la potencia en fa0
 		
-    sumarResultado_seno_coseno: 
+    sumar_resultado_seno_coseno: 
         #Esta función suma (si n es par) o resta (si n es impar) el valor obtenido en la iteración al resto del resultado
 
         #Argumentos:
@@ -79,10 +79,10 @@
         fneg.s fa1, fa1     #fa1 = -fa1
         
         else3: 
-            fadd.s fa0, fa0, fa1        #Sumamos y devolvemos en fa0 
+            fadd.s fa0, fa0, fa1 #Sumamos y devolvemos en fa0 
             jr ra       
 
-    calculoSeno: 
+    calculo_seno: 
         #Esta función utiliza las anteriores conjuntamente para calcular el seno con un error menor a 0.001
 
         #Argumentos:
@@ -149,7 +149,7 @@
             fmv.s fa1, fs4      #fa1 = fs4 (x)
             mv a0, s0           #a0 = s0 (n)
             
-            jal ra potencia_seno
+            jal ra potencia_seno_coseno
             
             fmv.s fs5, fa0      #Actualizamos la potencia acumulada 
 
@@ -166,7 +166,7 @@
                 fmv.s fa1, fs2      #fa1 = fs2 (valor de la iteración)
                 mv a0, s0           #a0 = s0 (n)
                 
-                jal ra sumarResultado_seno_coseno
+                jal ra sumar_resultado_seno_coseno
                 
                 fmv.s fs1, fa0      #fs1 = fa0 (el nuevo valor acumulado del seno, tras sumar o restar (en función de n)el valor de la iteración)
 
@@ -188,32 +188,32 @@
 
         jr ra
 
-    factorialCoseno: #argumentos en fa0 (factorial calculado anteriormente) y a0 (n)
-        beq a0, zero, elseFactorialCoseno #Si n = 0, directamente devolvemos que el factorial es 1.
+    factorial_coseno: #argumentos en fa0 (factorial calculado anteriormente) y a0 (n)
+        beq a0, zero, else_factorial_coseno #Si n = 0, directamente devolvemos que el factorial es 1.
             #Preparamos los registros que vamos a utilizar en el bucle: 
             slli t0, a0, 1
             mv t1, t0
             addi t0, t0, -1 #t0 = 2*n - 1; es el valor sobre el que vamos a iterar.
             addi t1, t1, 1 #t1 = 2*n + 1; es la cota que limita el número de iteraciones.
-            whileFactorialCoseno: bge t0, t1, endWhileFactorialCoseno
+            while_factorial_coseno: bge t0, t1, endWhile_factorial_coseno
                 fcvt.s.w ft0, t0 #Utilizamos ft0 para convertir el valor del iterador a coma flotante
                 fmul.s fa0, fa0, ft0
                 addi t0, t0, 1
-                j whileFactorialCoseno
-            endWhileFactorialCoseno: jr ra #Devuelve el factorial calculado en fa0
-        elseFactorialCoseno: li t0, 1
+                j while_factorial_coseno
+            endWhile_factorial_coseno: jr ra #Devuelve el factorial calculado en fa0
+        else_factorial_coseno: li t0, 1
         fcvt.s.w fa0, t0
         jr ra #Devuelve el factorial calculado en fa0
 
-    potencia: #argumentos en fa0 (potencia Acumulada), fa1 (x) y a0 (n)
-        beq a0, zero, endWhilePotencia
-            li t0, 0
-            li t1, 2
-            whilePotencia: bge t0, t1, endWhilePotencia
-                fmul.s fa0, fa0, fa1
-                addi t0, t0, 1
-                j whilePotencia
-        endWhilePotencia: jr ra #Devuelve el valor de la potencia en fa0
+    # potencia: #argumentos en fa0 (potencia Acumulada), fa1 (x) y a0 (n)
+    #     beq a0, zero, endWhilePotencia
+    #         li t0, 0
+    #         li t1, 2
+    #         whilePotencia: bge t0, t1, endWhilePotencia
+    #             fmul.s fa0, fa0, fa1
+    #             addi t0, t0, 1
+    #             j whilePotencia
+    #     endWhilePotencia: jr ra #Devuelve el valor de la potencia en fa0
 
     # sumarResultado: #argumentos en fa0 (Estimación), fa1 (ErrorActual) y a0 (n)
     #     #Le aplicamos el (-1)**n al error calculado y se lo sumamos a la estimación.
@@ -224,7 +224,7 @@
     #     elseSumarResultado: fadd.s fa0, fa0, fa1 
     #     jr ra #Devuelve el valor de la estimación en fa0
 
-    calculoCoseno: #No terminal
+    calculo_coseno: #No terminal
 
         #Apilamos los registros s y el registro ra
         addi sp, sp, -32    
@@ -263,16 +263,16 @@
         #n --> s0
         li s0, 0
 
-        whileCalculoCoseno: fmv.s fa0, fs3 #Calculamos el factorial 
+        while_calculo_coseno: fmv.s fa0, fs3 #Calculamos el factorial 
             mv a0, s0
-            jal ra factorialCoseno
+            jal ra factorial_coseno
             fmv.s fs3, fa0 #Actualizamos el factorial
 
             #Calculamos la potencia
             fmv.s fa0, fs5
             fmv.s fa1, fs4
             mv a0, s0
-            jal ra potencia
+            jal ra potencia_seno_coseno
             fmv.s fs5, fa0
 
             #Calculamos el valor
@@ -282,17 +282,17 @@
             fabs.s ft0, fs2 
 
             flt.s t0, ft0, fs0 #Guardamos el valor de la comparación en t0
-            bne t0, zero, endWhileCalculoCoseno
+            bne t0, zero, endWhile_calculo_coseno
                 fmv.s fa0, fs1
                 fmv.s fa1, fs2
                 mv a0, s0
-                jal ra sumarResultado_seno_coseno
+                jal ra sumar_resultado_seno_coseno
                 fmv.s fs1, fa0
 
                 addi s0, s0, 1
-                j whileCalculoCoseno
+                j while_calculo_coseno
 
-        endWhileCalculoCoseno: fmv.s fa0, fs1
+        endWhile_calculo_coseno: fmv.s fa0, fs1
         
         #Deshacemos la pila
         flw fs0 28(sp) 
@@ -307,14 +307,14 @@
 
         jr ra
 
-    factorialNumE: #argumentos en fa0 y a0
-        beq a0, zero, elseFactorialNumE #En n = 0 devolvemos un 1.
+    factorial_numE: #argumentos en fa0 y a0
+        beq a0, zero, else_Factorial_numE #En n = 0 devolvemos un 1.
             fcvt.s.w ft0, a0 #ft0 (lo utilizamos para convertir a0 a coma flotante)
             fmul.s fa0, fa0, ft0
-            j finFactorialNumE
-        elseFactorialNumE: li t0, 1
+            j fin_factorial_numE
+        else_factorial_numE: li t0, 1
             fcvt.s.w fa0, t0
-        finFactorialNumE: jr ra #Devuelve el nuevo factorial en fa0
+        fin_factorial_numE: jr ra #Devuelve el nuevo factorial en fa0
 
     calculoE: 
         #Apilamos los registros "s" y el registro "ra"
@@ -351,19 +351,19 @@
         li s0, 0
 
         #Calculamos el factorial
-        whileCalculoE: fmv.s fa0, fs3
+        while_calculoE: fmv.s fa0, fs3
         mv a0, s0
-        jal ra factorialNumE
+        jal ra factorial_numE
         fmv.s fs3, fa0
 
         #Calculamos el error cometido
         fdiv.s fs2, fs4, fs3
         flt.s t0, fs2, fs0
-        bne t0, zero, endWhileCalculoE
+        bne t0, zero, endWhile_calculoE
             fadd.s fs1, fs1, fs2
             addi s0, s0, 1
-            j whileCalculoE
-        endWhileCalculoE: fmv.s fa0, fs1
+            j while_calculoE
+        endWhile_calculoE: fmv.s fa0, fs1
         
         #Desapilamos los valores guardados
         flw fs0, 24(sp)
