@@ -32,8 +32,8 @@
             fcvt.s.w fa0, t0
             jr ra       #Devuelve el nuevo factorial en fa0
 
-    potencia_seno_coseno: 
-        #Esta función toma el valor de la anterior potencia y lo multiplica dos veces por x obteniendo así x^(2n + 1)
+    potencia_seno: 
+        #Esta función toma el valor de la anterior potencia y lo multiplica dos veces por x 
 
         #Argumentos:
         #fa0 --> potencia acumulada de anteriores iteraciones
@@ -45,21 +45,22 @@
         #t1 --> cota (2)
         
         
-        beq a0, zero, else_potencia  #Si n es igual a 0 simplemente devolvemos x
+        beq a0, zero, else_potencia_seno  #Si n es igual a 0 simplemente devolvemos x
 
         li t0, 0
         li t1, 2
         
-        while_potencia: bge t0, t1, endWhile_potencia
+        while_potencia_seno: bge t0, t1, endWhile_potencia_seno
             fmul.s fa0, fa0, fa1
             addi t0, t0, 1
-            j while_potencia
+            j while_potencia_seno
         
-        else_potencia: 
+        else_potencia_seno: 
             fmv.s fa0, fa1
         
-        endWhile_potencia: jr ra  #Devolvemos valor de la potencia en fa0
-		
+        endWhile_potencia_seno: jr ra  #Devolvemos valor de la potencia en 
+        
+
     sumar_resultado_seno_coseno: 
         #Esta función suma (si n es par) o resta (si n es impar) el valor obtenido en la iteración al resto del resultado
 
@@ -147,7 +148,7 @@
             fmv.s fa1, fs4      #fa1 = fs4 (x)
             mv a0, s0           #a0 = s0 (n)
             
-            jal ra potencia_seno_coseno
+            jal ra potencia_seno
             
             fmv.s fs5, fa0      #Actualizamos la potencia acumulada 
 
@@ -202,6 +203,38 @@
         else_factorial_coseno: li t0, 1
         fcvt.s.w fa0, t0
         jr ra #Devuelve el factorial calculado en fa0
+    
+    potencia_coseno: 
+        #Esta función toma el valor de la anterior potencia y lo multiplica dos veces por x 
+
+        #Argumentos:
+        #fa0 --> potencia acumulada de anteriores iteraciones
+        #fa1 --> valor de x
+        #a0 --> n
+
+        #Registros utilizados:
+        #t0 --> iterador (vale 0 inicialmente)
+        #t1 --> cota (2)
+        
+        
+        beq a0, zero, else_potencia_coseno  #Si n es igual a 0 simplemente devolvemos x
+
+        li t0, 0
+        li t1, 2
+        
+        while_potencia_coseno: bge t0, t1, endWhile_potencia_coseno
+            fmul.s fa0, fa0, fa1
+            addi t0, t0, 1
+            j while_potencia_coseno
+        
+        endWhile_potencia_coseno: 
+            jr ra
+		
+        else_potencia_coseno: 
+            li t0, 1
+            fcvt.s.w fa0, t0
+            jr ra 
+
 
     calculo_coseno: #No terminal
 
@@ -251,7 +284,7 @@
             fmv.s fa0, fs5
             fmv.s fa1, fs4
             mv a0, s0
-            jal ra potencia_seno_coseno
+            jal ra potencia_coseno
             fmv.s fs5, fa0
 
             #Calculamos el valor
@@ -407,6 +440,6 @@
     main:
         li a7, 6
         ecall
-        jal ra calculo_tan
+        jal ra calculo_coseno
         li a7, 2
         ecall
