@@ -140,7 +140,7 @@
             fmv.s fa0, fs3      #fa0 = fs3 (anterior factorial)  
             mv a0, s0           #ao = s0 (n)
 
-            jal ra factorial
+            jal ra factorial_seno
             
             fmv.s fs3, fa0      #Actualizamos el factorial
 
@@ -149,7 +149,7 @@
             fmv.s fa1, fs4      #fa1 = fs4 (x)
             mv a0, s0           #a0 = s0 (n)
             
-            jal ra potencia
+            jal ra potencia_seno
             
             fmv.s fs5, fa0      #Actualizamos la potencia acumulada 
 
@@ -166,7 +166,7 @@
                 fmv.s fa1, fs2      #fa1 = fs2 (valor de la iteración)
                 mv a0, s0           #a0 = s0 (n)
                 
-                jal ra sumarResultado
+                jal ra sumarResultado_seno_coseno
                 
                 fmv.s fs1, fa0      #fs1 = fa0 (el nuevo valor acumulado del seno, tras sumar o restar (en función de n)el valor de la iteración)
 
@@ -215,14 +215,14 @@
                 j whilePotencia
         endWhilePotencia: jr ra #Devuelve el valor de la potencia en fa0
 
-    sumarResultado: #argumentos en fa0 (Estimación), fa1 (ErrorActual) y a0 (n)
-        #Le aplicamos el (-1)**n al error calculado y se lo sumamos a la estimación.
-        li t0, 2
-        rem t0, a0, t0 
-        beq t0, zero, elseSumarResultado
-            fneg.s fa1, fa1
-        elseSumarResultado: fadd.s fa0, fa0, fa1 
-        jr ra #Devuelve el valor de la estimación en fa0
+    # sumarResultado: #argumentos en fa0 (Estimación), fa1 (ErrorActual) y a0 (n)
+    #     #Le aplicamos el (-1)**n al error calculado y se lo sumamos a la estimación.
+    #     li t0, 2
+    #     rem t0, a0, t0 
+    #     beq t0, zero, elseSumarResultado
+    #         fneg.s fa1, fa1
+    #     elseSumarResultado: fadd.s fa0, fa0, fa1 
+    #     jr ra #Devuelve el valor de la estimación en fa0
 
     calculoCoseno: #No terminal
 
@@ -286,7 +286,7 @@
                 fmv.s fa0, fs1
                 fmv.s fa1, fs2
                 mv a0, s0
-                jal ra sumarResultado
+                jal ra sumarResultado_seno_coseno
                 fmv.s fs1, fa0
 
                 addi s0, s0, 1
@@ -377,9 +377,57 @@
 
         jr ra
 
+    calculoTan:
+        #Esta función calcula la tangente de un número dado x
+
+        #Argumentos:
+        #fa0 --> El número del que queremos calcular la tangente (x)
+
+        #Registros a usar:
+        #fs0 --> El valor de x
+        #fs1 --> El valor del coseno de x
+        #fs2 --> El valor del seno de x
+
+        #Apilamos los registros s y el registro ra
+        addi, sp, sp, -16
+        fsw fs0, 12(sp)
+        fsw fs1, 8(sp)
+        fsw fs2, 4(sp)
+        sw ra, 0(sp)
+
+        fmv.s fs0, fa0      #Almacenamos en fs0 el valor de x
+
+        jal ra calculoCoseno        #Calculamos el coseno y lo almacenamos en fs1
+        fmv.s fs1, fa0
+        
+        fcvt.s.w ft0, zero
+        feq.s t0, fs1, ft0
+
+        beq t0, zero, else_tan      #Si el coseno es 0, como es el denominador devolvemos infinito
+            li t1, 0x7F800000
+            fmv.w.x fa0, t1
+            j fin_tan
+
+        else_tan:
+
+        fmv.s fa0, fs0
+        
+        jal ra calculoSeno      #Calculamos el seno y lo almacenamos en fs2
+        fmv.s fs2, fa0
+
+        fdiv.s fa0, fs2, fs1        #fa0 = fs2 / fs1 (sen/cos)
+
+        fin_tan:
+            #Desapilamos los registros s y ra
+            flw fs0, 12(sp)
+            flw fs1, 8(sp)
+            flw fs0, 4(sp)
+            lw ra, 0(sp)
+            addi sp, sp, 16
+            jr ra
     main:
         li a7, 6
         ecall
-        jal ra calculoSeno
+        jal ra calculoTan
         li a7, 2
         ecall

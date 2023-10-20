@@ -140,7 +140,7 @@
             fmv.s fa0, fs3      #fa0 = fs3 (anterior factorial)  
             mv a0, s0           #ao = s0 (n)
 
-            jal ra factorial
+            jal ra factorial_seno
             
             fmv.s fs3, fa0      #Actualizamos el factorial
 
@@ -149,7 +149,7 @@
             fmv.s fa1, fs4      #fa1 = fs4 (x)
             mv a0, s0           #a0 = s0 (n)
             
-            jal ra potencia
+            jal ra potencia_seno
             
             fmv.s fs5, fa0      #Actualizamos la potencia acumulada 
 
@@ -166,7 +166,7 @@
                 fmv.s fa1, fs2      #fa1 = fs2 (valor de la iteración)
                 mv a0, s0           #a0 = s0 (n)
                 
-                jal ra sumarResultado
+                jal ra sumarResultado_seno_coseno
                 
                 fmv.s fs1, fa0      #fs1 = fa0 (el nuevo valor acumulado del seno, tras sumar o restar (en función de n)el valor de la iteración)
 
