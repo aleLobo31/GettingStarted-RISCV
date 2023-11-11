@@ -1,0 +1,109 @@
+.data
+	#Matriz de prueba A
+	A:  .word 0, 1, 2, 3
+    	.word 4, 5, 6, 7
+      .word 8, 9, 10, 11
+      .word 12, 13, 14, 15
+  #Matriz de prueba B
+ 	B:  .zero 64
+ 	N: .word 4 #Número de filas
+ 	M: .word 4 #Númeor de columnas
+    
+.text
+    factorial: #Función Terminal
+    	li t0, 1 #Resultado Final
+      li t1, 1 #Iterador
+		while_factorial: bgt t1, a0, end_while_factorial
+        	mul t0, t0, t1
+          addi t1, t1, 1
+          j while_factorial
+        end_while_factorial: mv a0, t0
+        jr ra
+        
+    factorial_matrix: #Función No Terminal
+
+        #Apilamos los registros "s" que vamos a utilizar y el registro ra
+        addi sp, sp, -20
+        sw s0, 0(sp)
+        sw s1, 4(sp)
+        sw s2, 8(sp)
+        sw s3, 12(sp)
+        sw ra, 16(sp)
+
+        li s0, 0        #Iterador auxiliar
+        mul s1, a2, a3  #Numero elementos de la matriz
+        mv s2, a0       #Dirección de Inicio Matriz A
+        mv s3, a1       #Dirección de Inicio Matriz B
+
+        while_factorial_matrix: bge s0, s1, endWhile_factorial_matrix
+            lw a0, 0(s2)      #Cargamos valor de la matriz A
+            jal ra factorial    #Computamos su factorial
+            sw a0, 0(s3)      #Guardamos valor en la matriz B
+            #Iteramos sobre las direcciones
+            addi s2, s2, 4
+            addi s3, s3, 4
+            #Iteramos sobre el número de elementos
+            addi s0, s0, 1
+            j while_factorial_matrix
+        endWhile_factorial_matrix: 
+        
+        #Desapilamos la pila
+        lw s0, 0(sp)
+        lw s1, 4(sp)
+        lw s2, 8(sp)
+        lw s3, 12(sp)
+        lw ra, 16(sp)
+        addi sp, sp, 20
+
+        jr ra
+        
+        main:
+          #Creamos espacio en la pila
+          addi sp, sp -12
+          sw ra, 0(sp)
+          sw s0, 4(sp)
+          sw s1, 8 (sp)
+          
+          la a0, A #Cargamos en a0 la dirección de la matriz A
+          la a1, B
+          la t0, N
+          lw a2, 0(t0) #Cargamos en a2 el número de filas de nuestra matriz
+          la t0, M
+          lw a3, 0(t0) #Cargamos en a3 el número de columnas de nuestra matriz
+          
+          #Ejecutamos la función una primera vez
+          rdcycle s0
+          jal ra factorial_matrix
+          rdcycle s1
+          sub s1 s1 s0
+          
+          #Imprimimos el el número de ciclos (s1) que ha empleado
+          li a7, 1
+          mv a0, s1
+          ecall
+          
+          la a0, A #Cargamos en a0 la dirección de la matriz A
+          la a1, B
+          la t0, N
+          lw a2, 0(t0) #Cargamos en a2 el número de filas de nuestra matriz
+          la t0, M
+          lw a3, 0(t0) #Cargamos en a3 el número de columnas de nuestra matriz
+          
+          #Ejecutamos la función una segunda vez
+          rdcycle s0
+          jal ra factorial_matrix
+          rdcycle s1
+          sub s1 s1 s0
+          
+          #Imprimimos el número de ciclos (s1) que ha empleado
+          li a7, 1
+          mv a0, s1
+          ecall
+          
+          #Deshacemos la pila
+          lw ra, 0(sp)
+          lw s0, 4(sp)
+          lw s1, 8 (sp)
+          addi sp, sp 12
+          
+          jr ra
