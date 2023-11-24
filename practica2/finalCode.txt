@@ -106,15 +106,15 @@ mulc reg1 reg2 reg3 reg4{
   }
 }
 
-beqc reg1 reg2 reg3 reg4 offset{
-		co=110100,
+beqc reg1 reg2 reg3 reg4 S6{
+    co=110100,
     nwords=1,
     reg1=reg(25,21),
     reg2=reg(20,16),
     reg3=reg(15,11),
     reg4=reg(10,6),
-    offset=address(5,0)rel,
-    help='if (reg1==reg3) && (reg2==reg4) then PC <- PC + offset'
+    S6=address(5,0)rel,
+    help='if (reg1==reg3) && (reg2==reg4) then PC <- PC + S6'
   {
     (T8,C5,SELA=10101,SELB=01011,MR=0,SELCOP=01011,MC,SELP=11,M7,C7),
     (T2,C4,C=110,B,A0=0,MADDR=back2fetch),
