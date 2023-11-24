@@ -43,6 +43,21 @@ la reg addr {
 	}
 }
 
+lc reg1 reg2 reg3 {
+		co=010011,
+    nwords=1,
+    reg1=reg(25,21),
+    reg2=reg(20,16),
+    reg3=reg(15,11),
+    help='r1 = memory[r3 + 0] (parte real) | r2 = memory[r3 + 4] (parte imaginaria)'
+  {
+    (MR=0,SELA=1011,T9,C0,C4), 
+    (Ta,R,BW=11,M1,C1,MA,MB=10,MC,SELCOP=1010,T6,C0),		
+    (T1,SELC=10101,MR=0,LC,Ta,R,BW=11,M1,C1),  
+    (T1,SELC=10000,MR=0,LC,A0=1,B=1,C=0) 		
+  }
+}
+
 sc reg1 reg2 reg3 {
 	co = 010010,
 	nwords = 1,
@@ -70,6 +85,64 @@ addc reg1 reg2 reg3 reg4 {
 	(SELA=10101, SELB=01011, SELCOP=01010, MC, T6, SELC=10101, LC, SELP=11, M7, C7)
 	(SELA=10000, SELB=00110, SELCOP=01010, MC, T6, SELC=10000, LC, A0=1, B=1, C=0)
 	}
+}
+
+mulc reg1 reg2 reg3 reg4{
+		co=010101,
+    nwords=1,
+    reg1=reg(25,21),
+    reg2=reg(20,16),
+    reg3=reg(15,11),
+    reg4=reg(10,6),
+    help='r1 = (r1*r3) - (r2*r4) ; r2 = (r1*r4) + (r2*r3)'
+  {
+    (SELA=10101,SELB=01011,MR=0,MA=0,MB=00,SELCOP=01100,MC,T6,C4),
+    (SELA=10000,SELB=00110,MR=0,MA=0,MB=00,SELCOP=01100,MC,T6,C5),
+    (MA,MB=01,SELCOP=01011,MC,C6,SELP=11,M7,C7),
+    (SELA=10101,SELB=00110,MR=0,MA=0,MB=00,SELCOP=01100,MC,T6,C4),
+    (SELA=10000,SELB=01011,MR=0,MA=0,MB=00,SELCOP=01100,MC,T6,C5),
+    (SELC=10000,MR=0,LC,MA,MB=01,SELCOP=01010,MC,T6),
+    (SELC=10101,MR=0,LC,T7,A0=1,B=1,C=0)
+  }
+}
+
+beqc reg1 reg2 reg3 reg4 offset{
+		co=110100,
+    nwords=1,
+    reg1=reg(25,21),
+    reg2=reg(20,16),
+    reg3=reg(15,11),
+    reg4=reg(10,6),
+    offset=address(5,0)rel,
+    help='if (reg1==reg3) && (reg2==reg4) then PC <- PC + offset'
+  {
+    (T8,C5,SELA=10101,SELB=01011,MR=0,SELCOP=01011,MC,SELP=11,M7,C7),
+    (T2,C4,C=110,B,A0=0,MADDR=back2fetch),
+    (SELA=10000,SELB=00110,MR=0,SELCOP=01011,MC,SELP=11,M7,C7),
+    (C=110,B,A0=0,MADDR=back2fetch),
+    (T5,M7=0,C7),
+    (SE,SIZE=110,OFFSET=0,T3,C5),
+    (MA,MB=01,SELCOP=1010,MC,T6,M2=0,C2,C=0,B=1,A0=1),
+    back2fetch: (T5,M7=0,C7,C=0,B=1,A0=1)
+  }
+}
+
+ret {
+		co=100010,
+    nwords=1,
+    help='PC <- BR(RA)',
+      {
+  	(SELA=00001,MR,T9,M2=0,C2,C=0,B=1,A0=1)
+			}
+}
+
+hcf {
+		co=100011,
+    nwords=1,
+    help='PC <- 0x00 ; SR <- 0x00',
+      {
+  	(SELA=00000,MR,T9,M2=0,C2,M7=0,C7,C=0,B=1,A0=1)
+			}
 }
 
 call addr {
