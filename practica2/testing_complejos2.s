@@ -52,12 +52,6 @@ with_ext:
         sc t0, t1, (a0)
         ret
 main: 
-    addi sp, sp, -16
-    sw s0, 0(sp)
-    sw s1, 4(sp)
-    sw s2, 8(sp)
-    sw ra, 12(sp)
-    
     rdcycle s0
         la a0, a
         la a1, b
@@ -70,11 +64,4 @@ main:
         call no_ext
     rdcycle s2
         sub s2 s2 s0
-    
-    lw s0, 0(sp)
-    lw s1, 4(sp)
-    lw s2, 8(sp)
-    lw ra, 12(sp)
-    addi sp, sp, 16
-
     hcf 
